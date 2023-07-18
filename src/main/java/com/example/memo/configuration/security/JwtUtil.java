@@ -14,7 +14,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-@Slf4j
+@Slf4j(topic = "JwtUtil")
 @UtilityClass
 public class JwtUtil {
 	private final String AUTHORIZATION_HEADER = "Authorization";
@@ -28,6 +28,7 @@ public class JwtUtil {
 	private final Key key = Keys.secretKeyFor(signatureAlgorithm);
 
 	public String createToken(String username) {
+		log.info("token 생성");
 		Date now = new Date();
 
 		return BEARER_PREFIX +

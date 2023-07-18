@@ -41,11 +41,13 @@ public class MemberService implements UserDetailsService {
 	}
 
 	public String login(LoginRequest loginRequest) {
+		// 받아온 email로 회원 확인
 		Member member = memberRepository.findByEmail(loginRequest.email());
+		// 해당 email로 등록된 회원이 없다면
 		if (member == null) {
 			throw new UsernameNotFoundException(loginRequest.email());
 		}
-
+		// 비밀번호가 일치하지 않다면
 		if (!passwordEncoder.matches(loginRequest.password(), member.getPassword())) {
 			throw new BadCredentialsException("잘못된 요청입니다. 아이디 또는 비밀번호를 확인해주세요.");
 		}
