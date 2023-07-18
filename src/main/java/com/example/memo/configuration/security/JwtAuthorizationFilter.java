@@ -1,5 +1,7 @@
 package com.example.memo.configuration.security;
 
+import com.example.memo.domain.entity.Member;
+import com.example.memo.service.MemberService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,27 +35,29 @@ class JwtAuthorizationFilter extends OncePerRequestFilter {
 			token = token.substring(7);
 
 			if (!JwtUtil.validateToken(token)) {
-				log.error("Token Error");
+				log.error("유효하지 않은 토큰");
 				return;
 			}
 
 			// token의 claim 부분에서 "auth"의 value값 가져오기
 			Claims userInfo = JwtUtil.getUserInfoFromToken(token);
-			String username = userInfo.getSubject();
-			User user = null;
+//			String username = userInfo.getSubject();
+//			Member member = null;
 
-			// 만약 "ROLE_MEMBER" 권한이 있다면
-			if(!user.getAuthorities().isEmpty()) {
+			// 만약 "ROLE_MEMBER" 권한이 없다면
+			if(!userInfo.get("auth").equals("ROLE_MEMBER")) {
+				log.error("권한 없음");
+				return;
+			} else {
 				// SecurityContextHolder에 setContext
 				SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-				//인증객체 생성
-				UserDetails userDetails = null;
-				Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, user.getAuthorities());
+				//member -> userDetails, 인증객체 생성
+				UserDetails userDetails; //= MemberService.loadUserByUsername;
+				Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 				context.setAuthentication(authentication);
 
 				SecurityContextHolder.setContext(context);
-
 			}
 		}
 		filterChain.doFilter(request, response);
